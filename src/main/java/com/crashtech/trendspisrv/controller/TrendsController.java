@@ -3,20 +3,27 @@ package com.crashtech.trendspisrv.controller;
 import com.crashtech.trendspisrv.repository.TrendsRepository;
 import com.crashtech.trendspisrv.models.Trend;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@Validated
 public class TrendsController {
 
     private final TrendsRepository trendsRepository;
+    private final MessageSource messageSource;
 
     @Autowired
-    public TrendsController(TrendsRepository trendsRepository) {
+    public TrendsController(TrendsRepository trendsRepository, MessageSource messageSource) {
         this.trendsRepository = trendsRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -64,5 +71,15 @@ public class TrendsController {
         trend.setId(trendId);
         trendsRepository.save(trend);
         return trend;
+    }
+
+    @GetMapping("/greet")
+    public String sayHello(){
+       return messageSource.getMessage("common.hello",null, LocaleContextHolder.getLocale());
+    }
+
+    @GetMapping("/greetings")
+    public String sayHelloWithHeader(@RequestHeader(name="Accept-Language",required = false) @RequestParam(required = false) String lang, Locale locale){
+        return messageSource.getMessage("common.hello",null, Locale.of(lang));
     }
 }
